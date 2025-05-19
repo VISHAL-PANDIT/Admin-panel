@@ -9,7 +9,7 @@ app.get('/',(req: Request , res: Response)=>{
     res.status(statusCode).json({
         status: statusCode,
         message: "Welcome to API"
-    })
+    }) 
 })
 
 export default app;

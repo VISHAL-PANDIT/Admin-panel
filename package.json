@@ -1,0 +1,27 @@
+{
+  "name": "ecommadminpanel",
+  "version": "1.0.0",
+  "description": "This is a Ecomm Admin Panel project",
+  "homepage": "https://github.com/VISHAL-PANDIT/Admin-panel#readme",
+  "bugs": {
+    "url": "https://github.com/VISHAL-PANDIT/Admin-panel/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VISHAL-PANDIT/Admin-panel.git"
+  },
+  "license": "ISC",
+  "author": "vishal <vishalpandit1172004@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.19",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}

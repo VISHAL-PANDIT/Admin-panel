@@ -1,1 +1,13 @@
-console.log('Welcome to ebook Apis');
+import app from './src/app'
+
+const startServer = ()=>{
+    const port = process.env.PORT ?? 3000;
+
+
+    app.listen(port , () => {
+        console.log(`Listenig on port ${port}`) ;
+        
+    })
+}
+
+startServer();

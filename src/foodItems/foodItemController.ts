@@ -96,5 +96,34 @@ const listFoods = async (req: Request, res: Response, next: NextFunction) => {
   }
 };
 
+const getingSingleList = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId, foodId } = req.params;
 
-export { createFoodItem, updateFoodItem ,listFoods };
+  if (!userId || !foodId) {
+    return next(createHttpError(400, "User ID and Food ID are required"));
+  }
+
+  try {
+    const db = await getConnection();
+
+    const [rows] = await db.query<FoodItem[] & RowDataPacket[]>(
+      `SELECT * FROM food WHERE user_id = ? AND id = ?`,
+      [userId, foodId]
+    );
+
+    if (rows.length === 0) {
+      return next(createHttpError(404, "No food item found for the given user and food ID"));
+    }
+
+    res.status(200).json({
+      message: `Food item with ID ${foodId} for user ${userId}`,
+      data: rows[0],
+    });
+
+  } catch (error) {
+    console.error("Error while fetching food item:", error);
+    return next(createHttpError(500, "Error while fetching food item"));
+  }
+};
+
+export { createFoodItem, updateFoodItem ,listFoods , getingSingleList };

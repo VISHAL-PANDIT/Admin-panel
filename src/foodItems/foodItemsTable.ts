@@ -3,6 +3,7 @@ import getConnection from "../config/db";
 const createFoodTable = async () => {
   const db = await getConnection();
 
+  // Create the table only if it doesn't exist
   await db.query(`
     CREATE TABLE IF NOT EXISTS food (
       id INT AUTO_INCREMENT PRIMARY KEY,
@@ -14,7 +15,7 @@ const createFoodTable = async () => {
     );
   `);
 
-  console.log(` Table 'foodItem' ensured`);
+  console.log(`Table 'food' ensured`);
 };
 
 export default createFoodTable;

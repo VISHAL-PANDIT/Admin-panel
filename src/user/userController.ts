@@ -54,8 +54,53 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     return next(createHttpError(500, "Error while creating user"));
   }
 };
-// const loginUser = (req: Request , res: Response , next: NextFunction) =>{
-    
-// }
 
-export {createUser}
+
+ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
+  const { email, password } = req.body;
+  const tableName = "User";
+
+  if (!email || !password) {
+    return next(createHttpError(400, "Email and password are required"));
+  }
+
+  try {
+    const db = await getConnection();
+
+    // Fetch the user from DB
+    const [rows] = await db.query<RowDataPacket[]>(
+      `SELECT * FROM \`${tableName}\` WHERE email = ?`,
+      [email]
+    );
+    
+
+    if (rows.length === 0) {
+      return next(createHttpError(400, "Invalid email or password"));
+    }
+
+    const user = rows[0];
+
+    // Compare hashed password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return next(createHttpError(400, "Invalid email or password"));
+    }
+
+    // Create JWT token
+    const token = sign(
+      { sub: user.id, email: user.email },
+      config.jwtSecret as string,
+      { expiresIn: '7d' }
+    );
+
+    res.status(200).json({
+      message: "Login successful",
+      accessToken: token,
+    });
+  } catch (error) {
+    console.error("Login error:", error);
+    return next(createHttpError(500, "Internal server error"));
+  }
+};
+
+export {createUser , loginUser}

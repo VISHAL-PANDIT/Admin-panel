@@ -4,7 +4,7 @@ const createFoodTable = async () => {
   const db = await getConnection();
 
   await db.query(`
-    CREATE TABLE IF NOT EXISTS foodItem (
+    CREATE TABLE IF NOT EXISTS food (
       id INT AUTO_INCREMENT PRIMARY KEY,
       user_id INT NOT NULL,
       name VARCHAR(100) NOT NULL,

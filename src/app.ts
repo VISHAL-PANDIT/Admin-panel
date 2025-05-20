@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import globalErrorHandler from './middleware/globalErrorHandler';
 import userRouter from './user/userRouter';
+import foodItemRRouter from './foodItems/foodItemRouter';
 
 export const app = express();
 app.use(express.json());
@@ -17,6 +18,7 @@ app.get('/',(req: Request , res: Response)=>{
 })
 
 app.use('/api/users', userRouter);
+app.use('/api/food', foodItemRRouter);
 
 app.use(globalErrorHandler)
 

@@ -16,4 +16,4 @@ import getConnection from "../config/db";
 
   console.log(` Table '${tableName}' ensured`);
 };
-export default createTable
+export default createTable;

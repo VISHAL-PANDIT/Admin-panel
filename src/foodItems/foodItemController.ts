@@ -2,6 +2,8 @@ import { NextFunction, Request, Response } from "express";
 import createHttpError from "http-errors";
 import getConnection from "../config/db";
 import createFoodTable from "./foodItemsTable";
+import { FoodItem } from "./foodItemTypes";
+import { RowDataPacket } from "mysql2";
 
 
 const createFoodItem = async (
@@ -65,4 +67,34 @@ const updateFoodItem = async (req: Request, res: Response, next: NextFunction) =
   }
 };
 
-export { createFoodItem, updateFoodItem };
+const listFoods = async (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.params.id;
+
+  try {
+    const db = await getConnection();
+
+    if (!userId) {
+      return next(createHttpError(400, "User ID is required"));
+    }
+
+    const [rows] = await db.query<FoodItem[] & RowDataPacket[]>(
+      "SELECT * FROM food WHERE user_id = ?",
+      [userId]
+    );
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "No food items found for this user." });
+    }
+
+    res.status(200).json({
+      message: `Food items for user ${userId}`,
+      data: rows,
+    });
+  } catch (error) {
+    console.error("Error fetching food items:", error);
+    return next(createHttpError(500, "Server error while fetching food items"));
+  }
+};
+
+
+export { createFoodItem, updateFoodItem ,listFoods };

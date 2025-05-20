@@ -126,4 +126,37 @@ const getingSingleList = async (req: Request, res: Response, next: NextFunction)
   }
 };
 
-export { createFoodItem, updateFoodItem ,listFoods , getingSingleList };
+const deleteFoodItem = async (req: Request, res: Response, next: NextFunction) => {
+  const { userId, foodId } = req.params;
+
+  if (!userId || !foodId) {
+    return next(createHttpError(400, "User ID and Food ID are required"));
+  }
+
+  try {
+    const db = await getConnection();
+
+    // Check if item exists first
+    const [rows] = await db.query<FoodItem[]>(
+      "SELECT * FROM food WHERE user_id = ? AND id = ?",
+      [userId, foodId]
+    );
+
+    if (rows.length === 0) {
+      return next(createHttpError(404, "Food item not found for the given user"));
+    }
+
+    await db.query("DELETE FROM food WHERE user_id = ? AND id = ?", [userId, foodId]);
+
+    res.status(200).json({
+      message: `Food item with ID ${foodId} deleted for user ${userId}`,
+    });
+  } catch (error) {
+    console.error("Error while deleting food item:", error);
+    return next(createHttpError(500, "Error while deleting food item"));
+  }
+};
+
+
+
+export { createFoodItem, updateFoodItem ,listFoods , getingSingleList , deleteFoodItem};

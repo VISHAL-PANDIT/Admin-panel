@@ -1,11 +1,12 @@
-import express from 'express';
-import { createFoodItem } from './foodItemController';
+import express, { RequestHandler } from 'express';
+import { createFoodItem, updateFoodItem } from './foodItemController';
 import authenticate from '../middleware/authenticate';
 
 
 
 const foodItemRRouter = express.Router();
 
-foodItemRRouter.post('/:id',authenticate,createFoodItem)
+foodItemRRouter.post('/:id',authenticate,createFoodItem);
+foodItemRRouter.patch('/:userId/:foodId' , authenticate , updateFoodItem as RequestHandler)
 
 export default foodItemRRouter;

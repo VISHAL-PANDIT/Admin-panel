@@ -3,6 +3,7 @@ import createHttpError from "http-errors";
 import getConnection from "../config/db";
 import createFoodTable from "./foodItemsTable";
 
+
 const createFoodItem = async (
     req: Request,
     res: Response,
@@ -31,4 +32,37 @@ const createFoodItem = async (
     }
 };
 
-export { createFoodItem };
+const updateFoodItem = async (req: Request, res: Response, next: NextFunction) => {
+  const { name, description } = req.body;
+  const { userId, foodId } = req.params;
+
+  if (!name || !description || !userId || !foodId) {
+    return next(createHttpError(400, "All fields are required: userId, foodId, name, description"));
+  }
+
+  try {
+    const db = await getConnection();
+
+    const [result] = await db.query(
+      `UPDATE food 
+       SET name = ?, description = ?
+       WHERE id = ? AND user_id = ?`,
+      [name, description, foodId, userId]
+    );
+
+    const updateResult = result as { affectedRows: number };
+    console.log(updateResult);
+    
+
+    if (updateResult.affectedRows === 0) {
+      return res.status(404).json({ message: "Food item not found or not owned by user" });
+    }
+
+    res.status(200).json({ message: "Food item updated successfully" });
+  } catch (error) {
+    console.error("Error updating food item:", error);
+    return next(createHttpError(500, "Server error while updating food item"));
+  }
+};
+
+export { createFoodItem, updateFoodItem };

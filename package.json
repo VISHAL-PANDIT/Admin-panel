@@ -39,6 +39,8 @@
     "typescript-eslint": "^8.32.1"
   },
   "dependencies": {
+    "@types/cors": "^2.8.18",
+    "cors": "^2.8.5",
     "mysql2": "^3.14.1"
   }
 }

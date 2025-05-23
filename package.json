@@ -25,6 +25,7 @@
     "@types/express": "^5.0.2",
     "@types/http-errors": "^2.0.4",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.15.19",
     "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
@@ -40,7 +41,10 @@
   },
   "dependencies": {
     "@types/cors": "^2.8.18",
+    "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
+    "multer": "^2.0.0",
+    "multer-storage-cloudinary": "^4.0.0",
     "mysql2": "^3.14.1"
   }
 }

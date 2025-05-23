@@ -1,15 +1,23 @@
-import express, { RequestHandler } from 'express';
+import express from 'express';
 import { createFoodItem, deleteFoodItem, getingSingleList, listFoods, updateFoodItem } from './foodItemController';
 import authenticate from '../middleware/authenticate';
+import { uploadMiddleware } from "../config/cloudinary";
 
+const foodItemRouter = express.Router();
 
+// Create food item with image upload
+foodItemRouter.post('/:userId', authenticate, uploadMiddleware, createFoodItem as express.RequestHandler);
 
-const foodItemRRouter = express.Router();
+// Update food item with image upload
+foodItemRouter.put('/:userId/:foodId', authenticate, uploadMiddleware, updateFoodItem as express.RequestHandler);
 
-foodItemRRouter.post('/:id',authenticate,createFoodItem);
-foodItemRRouter.patch('/:userId/:foodId' , authenticate , updateFoodItem as RequestHandler);
-foodItemRRouter.get('/:id',listFoods as RequestHandler);
-foodItemRRouter.get('/:userId/:foodId' , getingSingleList );
-foodItemRRouter.delete('/:userId/:foodId',authenticate, deleteFoodItem)
+// List all food items for a user
+foodItemRouter.get('/:userId', authenticate, listFoods as express.RequestHandler);
 
-export default foodItemRRouter;
+// Get single food item
+foodItemRouter.get('/:userId/:foodId', authenticate, getingSingleList as express.RequestHandler);
+
+// Delete food item
+foodItemRouter.delete('/:userId/:foodId', authenticate, deleteFoodItem as express.RequestHandler);
+
+export default foodItemRouter;

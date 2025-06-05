@@ -11,7 +11,7 @@ import { config } from "../config/config";
 
 const createUser = async (req: Request, res: Response, next: NextFunction) => {
   const { name, email, password } = req.body;
-  const tableName = "User"; 
+  const tableName = "user"; // Changed to lowercase for consistency
 
   if (!name || !email || !password) {
     return next(createHttpError(400, "All fields are required"));
@@ -29,7 +29,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     );
 
     if (rows.length > 0) {
-      return next(createHttpError(400, `${tableName} already exists with this email`));
+      return next(createHttpError(400, `User already exists with this email`));
     }
 
     const hashPassword = await bcrypt.hash(password, 10);
@@ -42,14 +42,25 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = sign({sub: result.insertId} , config.jwtSecret as string , {expiresIn: '7d'});
     
     return res.status(201).json({ 
-    message: `${tableName} created successfully` ,
-    accessToken: token
+      message: `User created successfully`,
+      accessToken: token
     });
-
-
     
   } catch (error) {
-    console.log(error);
+    console.error('Error in createUser:', error);
+    
+    // Check for specific database errors
+    if (error instanceof Error) {
+      if (error.message.includes('ER_DUP_ENTRY')) {
+        return next(createHttpError(400, 'Email already exists'));
+      }
+      if (error.message.includes('ER_NO_SUCH_TABLE')) {
+        return next(createHttpError(500, 'Database table not found'));
+      }
+      if (error.message.includes('ER_ACCESS_DENIED_ERROR')) {
+        return next(createHttpError(500, 'Database access denied'));
+      }
+    }
     
     return next(createHttpError(500, "Error while creating user"));
   }
@@ -58,7 +69,7 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
 
  const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   const { email, password } = req.body;
-  const tableName = "User";
+  const tableName = "user";
 
   if (!email || !password) {
     return next(createHttpError(400, "Email and password are required"));

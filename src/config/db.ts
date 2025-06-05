@@ -1,29 +1,43 @@
-import mysql, { Connection } from 'mysql2/promise';
-import { config } from './config';
+import mysql from 'mysql2/promise';
 
-let connection: Connection | null = null;
-
-const getConnection = async (): Promise<Connection> => {
-  if (!connection) {
-    console.log(`Connecting to MySQL Server at ${config.host} as ${config.user}`);
-
-    connection = await mysql.createConnection({
-      host: config.host,
-      user: config.user,
-      password: config.password,
+const createDatabase = async () => {
+  try {
+    // First connect without database
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || ''
     });
 
-    console.log("Connected to MySQL (no database selected)");
+    // Create database if it doesn't exist
+    await connection.query(`CREATE DATABASE IF NOT EXISTS products`);
+    await connection.end();
 
-    // Ensure database exists
-    await connection.query(`CREATE DATABASE IF NOT EXISTS \`${config.database}\``);
-
-    // Switch to the database
-    await connection.changeUser({ database: config.database });
-
-    console.log(`Using database: ${config.database}`);
+    console.log('Database created or already exists');
+  } catch (error) {
+    console.error('Error creating database:', error);
+    throw error;
   }
-  return connection;
+};
+
+const getConnection = async () => {
+  try {
+    // Create database first
+    await createDatabase();
+
+    // Then create connection with database
+    const connection = await mysql.createConnection({
+      host: process.env.DB_HOST || 'localhost',
+      user: process.env.DB_USER || 'root',
+      password: process.env.DB_PASSWORD || '',
+      database: 'products'
+    });
+
+    return connection;
+  } catch (error) {
+    console.error('Error connecting to database:', error);
+    throw error;
+  }
 };
 
 export default getConnection;
